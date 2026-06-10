@@ -1,0 +1,22 @@
+services:
+  cc:
+    build: .
+    image: ccc-claude:latest
+    # Interactive TTY so the Claude Code TUI works.
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+    environment:
+      # Subscription OAuth token (see .env). Generate it with `just token`.
+      CLAUDE_CODE_OAUTH_TOKEN: ${CLAUDE_CODE_OAUTH_TOKEN:-}
+      # Optional API-key fallback, if you ever set it in .env instead.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    volumes:
+      # Your project: edits made inside the container land directly on the host.
+      - ${PROJECT_DIR:?set PROJECT_DIR in .env}:/workspace
+      # Persist login / history / settings across restarts and rebuilds.
+      - claude-config:/home/node/.claude
+    command: ["claude"]
+
+volumes:
+  claude-config:
